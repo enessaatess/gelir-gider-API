@@ -4,16 +4,21 @@ namespace App\Models;
 
 // use App\Traits\HasSecurePassword;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Auth\Authenticatable as AuthenticableTrait;
 
-class User extends Model
+class User extends \Eloquent implements Authenticatable
 {
     // use HasSecurePassword;
+    use AuthenticableTrait;
     
     /**
      * Validation rules
      *
      * @var array
      */
+    protected $table = 'user';
+
     protected $rules = [
         'name'     => 'required|max:255',
         'surname'     => 'required|max:255',
@@ -27,7 +32,7 @@ class User extends Model
      * @var string[]
      */
     protected $fillable = [
-        'name', 'email', 'password', 'password_confirmation',
+        'name', 'email', 'surname', 'password', 'password_confirmation',
     ];
 
     /**
@@ -36,7 +41,7 @@ class User extends Model
      * @var array
      */
     protected $hidden = [
-        'password_digest',
+        'password',
     ];
 
 
