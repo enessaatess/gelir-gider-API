@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Hash;
 use Session;
 use App\Models\User;
+use App\Models\Category;
+use App\Models\Currency;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -80,6 +83,55 @@ class UserController extends Controller
         Auth::logout();
   
         return Redirect('login');
+    }
+
+    public function createCategory(Request $request){
+        $request->validate([
+            'name' => 'required',
+            'category_select' => 'required',
+        ]);
+        $userId = Auth::id(); 
+        
+        $category = new Category();
+        $category->name = $request->name;
+        $category->category_select = $request->category_select;
+        $category->user_id = $userId;
+        $category->save();
+        
+        return redirect('category');
+    }
+    public function viewCategory(){
+        return view('register');
+    }
+
+    public function viewTransaction(){
+
+        $userId = Auth::id(); 
+        $currency = Currency::all();
+        $categories = Category::where('user_id', $userId)->get();
+        return view('register', compact('currency','categories'));
+    }
+
+    public function createTransaction(Request $request){
+
+        $request->validate([
+            'total' => 'required|regex:/^\d+(\.\d{1,2})?$/',
+            'date' => 'required|date',
+        ]);
+
+        $userId = Auth::id(); 
+        
+        $transaction = new Transaction();
+        $transaction->total = $request->total;
+        $transaction->transaction_date = $request->date;
+        $transaction->description = $request->description;
+        $transaction->user_id = $userId;
+        $transaction->currency_id = $request->currency;
+        $transaction->category_id = $request->category;
+        $transaction->save();
+
+        return redirect('transaction');
+
     }
 
 }

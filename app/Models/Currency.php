@@ -11,10 +11,13 @@ class Currency extends Model
 
     protected $table = 'currency';
 
+    protected $data = [];
+
     protected $fillable = [
         'name',
         'id',
         'symbol',
         'price'
     ];
+
 }

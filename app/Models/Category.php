@@ -18,9 +18,9 @@ class Category extends Model
         'category_select'
     ];
 
-    public function users()
-    {
-        return $this->belongsToMany(App\User::class);
-    }
+    // public function users()
+    // {
+    //     return $this->belongsToMany(App\User::class);
+    // }
     
 }
