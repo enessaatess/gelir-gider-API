@@ -31,3 +31,4 @@ Route::post('createTransaction', [UserController::class, 'createTransaction'])->
 
 Route::get('apicurreny', [currencyApiController::class, 'currencyApi'])->name('currencyApi');
 
+Route::get('edit/{id}', [UserController::class, 'edit'])->name('edit');

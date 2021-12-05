@@ -134,4 +134,43 @@ class UserController extends Controller
 
     }
 
+    public function edit($id) {
+        $userId = Auth::id();
+        
+        $transaction = Transaction::where('id', $id)->where('user_id', $userId)->get();
+        
+        if($userId == $transaction->user_id) {
+            return "burada";
+        }
+        else {
+            return "else de";
+        }
+        $currency = Currency::all();
+        $categories = Category::where('user_id', $userId)->get();
+
+        return view('transaction', compact('transaction','currency','categories'));
+    }
+
+    public function update($id) {
+
+        $transaction = Transaction::find($id);
+        $userId = Auth::id();
+
+        $transaction->total = $request->total;
+        $transaction->transaction_date = $request->date;
+        $transaction->description = $request->description;
+        $transaction->user_id = $userId;
+        $transaction->currency_id = $request->currency;
+        $transaction->category_id = $request->category;
+        $transaction->update();
+
+        return redirect('transaction');
+    }
+
+    public function destroy($id) {
+        $transaction = Transaction::findOrFail($id);
+        $transaction->delete();
+
+        return redirect('/transaction');
+    }
 }
