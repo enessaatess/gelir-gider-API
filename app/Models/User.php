@@ -47,7 +47,7 @@ class User extends \Eloquent implements Authenticatable
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->ManyTo(Category::class);
     }
 
 }

@@ -34,7 +34,7 @@ class currencySeed extends Seeder
             array(
                 'id' => 3,
                 'name' => 'TRY',
-                'price' => NULL,
+                'price' => 1,
                 'created_at' => NULL,
                 'updated_at' => NULL,
             ),

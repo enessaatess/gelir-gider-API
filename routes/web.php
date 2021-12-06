@@ -15,20 +15,29 @@ use App\Http\Controllers\currencyApiController;
 |
 */
 
+Route::get('/', function(){
+    return view("app");
+}); 
 Route::get('dashboard', [UserController::class, 'dashboard']); 
-Route::get('login', [UserController::class, 'index'])->name('login');
-Route::post('custom-login', [UserController::class, 'customLogin'])->name('login.custom'); 
-Route::get('register', [UserController::class, 'register'])->name('register');
-Route::post('custom-registration', [UserController::class, 'customRegistration'])->name('register.custom'); 
-Route::get('signout', [UserController::class, 'signOut'])->name('signout');
+Route::post('login', [UserController::class, 'customLogin']); 
+Route::post('register', [UserController::class, 'customRegistration']); 
+Route::post('user', [UserController::class, 'userInfo']); 
+Route::post('signout', [UserController::class, 'signOut']);
 
-Route::get('categories', [UserController::class, 'viewCategory'])->name('viewCategory');
-Route::post('createCategory', [UserController::class, 'createCategory'])->name('category.create'); 
+Route::post('categories', [UserController::class, 'viewCategory']);
+Route::post('createCategory', [UserController::class, 'createCategory']); 
 
 
-Route::get('transaction', [UserController::class, 'viewTransaction'])->name('viewTransaction');
-Route::post('createTransaction', [UserController::class, 'createTransaction'])->name('transaction.create'); 
+Route::post('transaction', [UserController::class, 'viewTransaction']);
+Route::post('deleteTransaction', [UserController::class, 'destroy']);
+Route::post('createTransaction', [UserController::class, 'createTransaction']); 
+Route::post('updateTransaction', [UserController::class, 'updateTransaction']); 
+Route::post('report', [UserController::class, 'viewPriceDetails']); 
 
-Route::get('apicurreny', [currencyApiController::class, 'currencyApi'])->name('currencyApi');
 
-Route::get('edit/{id}', [UserController::class, 'edit'])->name('edit');
+
+
+Route::get('apicurrency', [currencyApiController::class, 'currencyApi']));
+
+Route::post('currency', [UserController::class, 'currency']));
+

@@ -25,4 +25,12 @@ class Transaction extends Model
     {
         return $this->belongsToMany(App\User::class);
     }
+    public function category()
+    {
+        return $this->hasOne(Category::class,'id','category_id');
+    }
+    public function currency()
+    {
+        return $this->hasOne(Currency::class,'id','currency_id');
+    }
 }

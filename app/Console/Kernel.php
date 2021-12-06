@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $url = env('APP_URL').'/apicurreny';
+        $url = env('APP_URL').'/apicurrency';
         $schedule->command('currency:update')
          ->timezone('Europe/Istanbul')
          ->hourly()

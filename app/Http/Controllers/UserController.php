@@ -28,11 +28,10 @@ class UserController extends Controller
    
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard')
-                        ->withSuccess('Signed in');
+            return ["status" => "success"];
         }
   
-        return redirect("login")->withSuccess('Login details are not valid');
+        return ["status" => "failed"];
     }
 
     public function register()
@@ -53,10 +52,18 @@ class UserController extends Controller
         $data = $request->all();
         $check = $this->create($data);
          
-        return redirect("dashboard")->withSuccess('You have signed-in');
+        return ["status" => "success"];
     }
 
-
+    public function userInfo()
+    {
+        if(Auth::check())
+        {
+            return ["status" => "success","user" => Auth::user()];
+        }else{
+            return ["status" => "rejected", "user" => false];
+        }
+    }
     public function create(array $data)
     {
       return User::create([
@@ -82,7 +89,7 @@ class UserController extends Controller
         Session::flush();
         Auth::logout();
   
-        return Redirect('login');
+        return ["status" => "success"];
     }
 
     public function createCategory(Request $request){
@@ -98,79 +105,104 @@ class UserController extends Controller
         $category->user_id = $userId;
         $category->save();
         
-        return redirect('category');
+        return ["status" => "success"];
     }
     public function viewCategory(){
-        return view('register');
+        return Category::where('user_id', Auth::id())->get();
     }
 
     public function viewTransaction(){
 
-        $userId = Auth::id(); 
-        $currency = Currency::all();
-        $categories = Category::where('user_id', $userId)->get();
-        return view('register', compact('currency','categories'));
+        $currency = Transaction::where('user_id', Auth::id())->with("category","currency")->get();
+        return $currency;
+    }
+
+    public function currency(){
+
+        return Currency::all();
     }
 
     public function createTransaction(Request $request){
 
         $request->validate([
             'total' => 'required|regex:/^\d+(\.\d{1,2})?$/',
-            'date' => 'required|date',
+            'transaction_date' => 'required|date',
         ]);
 
         $userId = Auth::id(); 
         
         $transaction = new Transaction();
         $transaction->total = $request->total;
-        $transaction->transaction_date = $request->date;
+        $transaction->transaction_date = (new \Carbon\Carbon($request->transaction_date))->format("Y-m-d");
         $transaction->description = $request->description;
         $transaction->user_id = $userId;
-        $transaction->currency_id = $request->currency;
-        $transaction->category_id = $request->category;
+        $transaction->currency_id = $request->currency_id;
+        $transaction->category_id = $request->category_id;
         $transaction->save();
 
-        return redirect('transaction');
+        return ["status" => "success"];
 
     }
-
     public function edit($id) {
         $userId = Auth::id();
         
         $transaction = Transaction::where('id', $id)->where('user_id', $userId)->get();
-        
-        if($userId == $transaction->user_id) {
-            return "burada";
-        }
-        else {
-            return "else de";
-        }
+      
         $currency = Currency::all();
         $categories = Category::where('user_id', $userId)->get();
-
+      
         return view('transaction', compact('transaction','currency','categories'));
-    }
-
-    public function update($id) {
-
-        $transaction = Transaction::find($id);
-        $userId = Auth::id();
+      }
+      
+      public function updateTransaction(Request $request) {
+      
+        $transaction = Transaction::find($request->id);
 
         $transaction->total = $request->total;
-        $transaction->transaction_date = $request->date;
+        $transaction->transaction_date = (new \Carbon\Carbon($request->transaction_date))->format("Y-m-d");
         $transaction->description = $request->description;
         $transaction->user_id = $userId;
         $transaction->currency_id = $request->currency;
         $transaction->category_id = $request->category;
         $transaction->update();
-
-        return redirect('transaction');
-    }
-
-    public function destroy($id) {
-        $transaction = Transaction::findOrFail($id);
+      
+        return ["status" => "success"];
+      }
+      
+      public function destroy(Request $request) {
+        $transaction = Transaction::findOrFail($request->id);
         $transaction->delete();
+      
+        return ["status" => "success"];
+      }
+      public function viewPriceDetails(Request $request) {
 
-        return redirect('/transaction');
+        $userId = Auth::id();
+
+        $startdate = (new \Carbon\Carbon($request->startdate))->format("Y-m-d");
+        $enddate = (new \Carbon\Carbon($request->enddate))->format("Y-m-d");
+
+        $selectDate = Transaction::whereBetween('transaction_date', [$startdate, $enddate])->where('user_id',$userId)->get();
+        $gelir = 0;
+        $gider = 0;
+        foreach($selectDate as $date){
+            $categories = Category::where('user_id', $userId)->where('id', $date->category_id)->get();
+            foreach($categories as $category){
+                $currencies = Currency::where('id', $date->currency_id)->get();
+                if($category->category_select == "gelir"){
+                    foreach($currencies as $currency){
+                        $gelir += ($date->total)*($currency->price);
+                    }
+                } else {
+                    foreach($currencies as $currency){
+                        $gider += ($date->total)*($currency->price);
+                    }
+                }
+            }
+            
+        }
+        $total = $gelir - $gider;
+
+        return ["result" => $total];
     }
 }
