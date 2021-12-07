@@ -37,7 +37,7 @@ Route::post('report', [UserController::class, 'viewPriceDetails']);
 
 
 
-Route::get('apicurrency', [currencyApiController::class, 'currencyApi']));
+Route::get('apicurrency', [currencyApiController::class, 'currencyApi']);
 
-Route::post('currency', [UserController::class, 'currency']));
+Route::post('currency', [UserController::class, 'currency']);
 
